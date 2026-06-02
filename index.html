@@ -819,6 +819,14 @@
         white-space: pre-wrap;
       }
 
+      .followup-note {
+        color: var(--muted);
+      }
+
+      .inline-actions {
+        margin-top: 10px;
+      }
+
       .editor-actions {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1298,19 +1306,30 @@
             <h3>入力内容の整理</h3>
             <p id="editorMemo"></p>
           </article>
-          <article class="editor-card wide">
+          <article class="editor-card full">
+            <h3>よければ、もう少し聞かせてください</h3>
+            <p class="followup-note">
+              空欄でも送れます。思い出せるところだけ追記していただくと、編集部で確認しやすくなります。
+            </p>
+            <p id="publicFollowupQuestions"></p>
+            <textarea id="additionalNote" placeholder="例：娘がその言葉を言った時の様子、病気の時に支えになったこと、今ふり返って感じることなど。"></textarea>
+            <div class="inline-actions">
+              <button class="btn secondary" type="button" id="refreshDiagnosisBtn">追加した内容で整理し直す</button>
+            </div>
+          </article>
+          <article class="editor-card wide editor-only-card" hidden>
             <h3>編集部向け診断（試作）</h3>
             <p id="editorDiagnosis"></p>
           </article>
-          <article class="editor-card">
+          <article class="editor-card editor-only-card" hidden>
             <h3>誌面化の目安</h3>
             <p id="editorFit"></p>
           </article>
-          <article class="editor-card full">
+          <article class="editor-card full editor-only-card" hidden>
             <h3>足りない情報</h3>
             <p id="editorGaps"></p>
           </article>
-          <article class="editor-card full">
+          <article class="editor-card full editor-only-card" hidden>
             <h3>編集部が次に確認したいこと</h3>
             <p id="editorQuestions"></p>
           </article>
@@ -1339,6 +1358,7 @@
         "emotion",
         "change",
         "faith",
+        "additionalNote",
         "recommendReason",
       ];
 
@@ -1460,8 +1480,9 @@
         const emotion = value("emotion");
         const change = value("change");
         const faith = value("faith");
+        const additionalNote = value("additionalNote");
 
-        if (!scene && !event && !emotion && !change) {
+        if (!scene && !event && !emotion && !change && !additionalNote) {
           return "まだ概要を作れません。";
         }
 
@@ -1472,6 +1493,7 @@
         if (emotion) lines.push(`当時の思い: ${shorten(emotion, 72)}`);
         if (change) lines.push(`その後の変化: ${shorten(change, 92)}`);
         if (faith) lines.push(`現在の受け止め: ${shorten(faith, 72)}`);
+        if (additionalNote) lines.push(`追加で聞かせていただいたこと: ${shorten(additionalNote, 92)}`);
         return lines.join("\n");
       }
 
@@ -1493,7 +1515,7 @@
       }
 
       function storyText() {
-        return ["theme", "scene", "event", "emotion", "change", "faith", "recommendReason"]
+        return ["theme", "scene", "event", "emotion", "change", "faith", "additionalNote", "recommendReason"]
           .map((id) => value(id))
           .filter(Boolean)
           .join("\n");
@@ -1522,7 +1544,7 @@
 
       function editorialSignals() {
         const text = storyText();
-        const narrativeText = ["scene", "event", "emotion", "change", "faith", "recommendReason"]
+        const narrativeText = ["scene", "event", "emotion", "change", "faith", "additionalNote", "recommendReason"]
           .map((id) => value(id))
           .filter(Boolean)
           .join("\n");
@@ -1642,8 +1664,41 @@
         return questions.slice(0, 6);
       }
 
+      function buildPublicFollowups() {
+        const signals = editorialSignals();
+        const questions = [];
+
+        if (signals.daughter) {
+          questions.push("娘さんがその言葉を言われた時の場所や表情など、思い出せることはありますか。");
+        } else if (!signals.quote && !signals.eventVoice) {
+          questions.push("その時、心に残った言葉や相手の様子があれば教えてください。");
+        }
+        if (signals.illness) {
+          questions.push("病気が分かった時や治療中に、特に心に残っている場面はありますか。");
+        }
+        if (signals.family) {
+          questions.push("その出来事の前後で、家族との時間や接し方に変わったことはありますか。");
+        }
+        if (!signals.faithWord || value("faith").length < 40) {
+          questions.push("今ふり返って、信仰の上ではどのように受け止めていますか。");
+        }
+
+        if (!questions.length) {
+          questions.push("このままでも大丈夫です。あとで思い出したことがあれば、ここに追記できます。");
+        }
+        return questions.slice(0, 3);
+      }
+
       function numberedText(items) {
         return items.map((item, index) => `${index + 1}. ${item}`).join("\n");
+      }
+
+      function toPublicFollowups(items) {
+        const publicItems = items
+          .filter((item) => !/(掲載|伏せたい|匿名|推薦者|了承|連絡|編集部)/.test(item))
+          .map((item) => item.replace(/確認したいです。?$/, "教えてください。"))
+          .slice(0, 3);
+        return publicItems.length ? publicItems : buildPublicFollowups();
       }
 
       function collectDiagnosisPayload() {
@@ -1659,6 +1714,7 @@
           emotion: value("emotion"),
           change: value("change"),
           faith: value("faith"),
+          additionalNote: value("additionalNote"),
           recommendReason: value("recommendReason"),
         };
       }
@@ -1672,6 +1728,7 @@
         document.getElementById("editorDiagnosis").textContent = buildEditorialDiagnosis();
         document.getElementById("editorGaps").textContent = numberedText(buildEditorialGaps());
         document.getElementById("editorQuestions").textContent = numberedText(buildEditorFollowups());
+        document.getElementById("publicFollowupQuestions").textContent = numberedText(buildPublicFollowups());
         document.getElementById("editorFit").textContent =
           editorialScore() >= 75
             ? "素材あり。聞き取りで誌面化を検討できる"
@@ -1697,6 +1754,9 @@
         }
         if (Array.isArray(data.followups) && data.followups.length) {
           document.getElementById("editorQuestions").textContent = numberedText(data.followups);
+          document.getElementById("publicFollowupQuestions").textContent = numberedText(
+            toPublicFollowups(data.followups)
+          );
         }
       }
 
@@ -1860,6 +1920,7 @@
       }
       permission.addEventListener("change", updateSummary);
       document.getElementById("submitBtn").addEventListener("click", showEditorView);
+      document.getElementById("refreshDiagnosisBtn").addEventListener("click", showEditorView);
       document.getElementById("finishBtn").addEventListener("click", finishPrototype);
 
       updateSummary();
