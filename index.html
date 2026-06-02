@@ -1298,12 +1298,20 @@
             <h3>入力内容の整理</h3>
             <p id="editorMemo"></p>
           </article>
+          <article class="editor-card wide">
+            <h3>編集部向け診断（試作）</h3>
+            <p id="editorDiagnosis"></p>
+          </article>
           <article class="editor-card">
-            <h3>確認の目安</h3>
+            <h3>誌面化の目安</h3>
             <p id="editorFit"></p>
           </article>
           <article class="editor-card full">
-            <h3>足せるとよいこと</h3>
+            <h3>足りない情報</h3>
+            <p id="editorGaps"></p>
+          </article>
+          <article class="editor-card full">
+            <h3>編集部が次に確認したいこと</h3>
             <p id="editorQuestions"></p>
           </article>
         </div>
@@ -1484,6 +1492,156 @@
         return list;
       }
 
+      function storyText() {
+        return ["theme", "scene", "event", "emotion", "change", "faith", "recommendReason"]
+          .map((id) => value(id))
+          .filter(Boolean)
+          .join("\n");
+      }
+
+      function hasAny(text, terms) {
+        return terms.some((term) => text.includes(term));
+      }
+
+      function hasQuote(text) {
+        return /「[^」]{2,}」/.test(text);
+      }
+
+      function hasTimeHint(text) {
+        return /([0-9０-９一二三四五六七八九十]+(年|年前|月|日|歳|頃)|当時|昔|若い頃)/.test(text);
+      }
+
+      function hasPlaceHint(text) {
+        return hasAny(text, ["教会", "家", "自宅", "病院", "職場", "会社", "学校", "月次祭", "修養科"]);
+      }
+
+      function emailLooksValid() {
+        const email = value("email");
+        return !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function editorialSignals() {
+        const text = storyText();
+        const narrativeText = ["scene", "event", "emotion", "change", "faith", "recommendReason"]
+          .map((id) => value(id))
+          .filter(Boolean)
+          .join("\n");
+        return {
+          text,
+          illness: hasAny(text, ["病気", "身上", "がん", "癌", "胃がん", "入院", "手術", "治療", "検査"]),
+          family: hasAny(text, ["家族", "娘", "息子", "父", "母", "夫", "妻", "親", "子"]),
+          daughter: hasAny(text, ["娘"]),
+          faithWord: hasAny(narrativeText, ["親神様", "ご守護", "お道", "教会", "月次祭", "信仰", "ようぼく", "たすけ", "身上"]),
+          quote: hasQuote(text),
+          time: hasTimeHint(text),
+          place: hasPlaceHint(text),
+          eventVoice: hasAny(value("event"), ["言われ", "言って", "話", "一言", "声", "表情", "姿"]),
+        };
+      }
+
+      function editorialScore() {
+        const signals = editorialSignals();
+        let points = 0;
+        if (value("scene").length >= 40 && (signals.time || signals.place)) points += 22;
+        if (value("event").length >= 35 && (signals.quote || signals.eventVoice)) points += 24;
+        if (value("emotion").length >= 24) points += 14;
+        if (value("change").length >= 28) points += 16;
+        if (value("faith").length >= 24 && signals.faithWord) points += 18;
+        if (signals.illness || signals.family) points += 6;
+        return Math.min(points, 100);
+      }
+
+      function buildEditorialDiagnosis() {
+        const signals = editorialSignals();
+        const lines = [];
+
+        if (signals.illness && signals.family) {
+          lines.push("素材の核: 病気・身上を通して、家族との時間を受け直した体験として見えています。");
+        } else if (signals.illness) {
+          lines.push("素材の核: 病気・身上を通して何を受け止めたかが中心になりそうです。");
+        } else if (signals.family) {
+          lines.push("素材の核: 家族や身近な人との関わりの中で起きた気づきが中心になりそうです。");
+        } else {
+          lines.push("素材の核: 体験の方向性はありますが、誌面の入口になる代表場面をもう少し探したい状態です。");
+        }
+
+        if (signals.daughter) {
+          lines.push("記事の入口候補: 娘さんの言葉や反応が、タイトル・リードに使える中心場面になる可能性があります。");
+        } else if (signals.eventVoice || signals.quote) {
+          lines.push("記事の入口候補: 心に残った言葉や相手の姿を、具体的な場面として立てられそうです。");
+        }
+
+        if (!signals.faithWord) {
+          lines.push("注意点: 信仰上の受け止めはまだ本人の感想に近く、親神様・ご守護・教会での支えとどう結びつくか確認したいです。");
+        }
+
+        lines.push("仮の切り口: 「出来事そのもの」よりも、その出来事で何に気づき、暮らしや信仰がどう変わったかを軸にすると『陽気』の特集記事として扱いやすくなります。");
+        return lines.join("\n");
+      }
+
+      function buildEditorialGaps() {
+        const signals = editorialSignals();
+        const gaps = [];
+
+        if (!value("scene") || !(signals.time && signals.place)) {
+          gaps.push("場面の情報: いつ頃、どこで、誰がいて、何が起きたのか。");
+        }
+        if (!signals.quote && !signals.eventVoice) {
+          gaps.push("肉声のある一言: 相手が実際に言った言葉、声の調子、表情。");
+        } else if (signals.daughter) {
+          gaps.push("娘さんの一言: できれば実際の言葉に近い形、言われた場所、表情。");
+        }
+        if (signals.illness) {
+          gaps.push("病気・身上の経過: 診断、治療、仕事や生活で一番こたえたこと。");
+        }
+        if (signals.family) {
+          gaps.push("家族との変化: 以前はどうだったか、今は具体的に何が変わったか。");
+        }
+        if (!signals.faithWord || value("faith").length < 24) {
+          gaps.push("信仰上の受け止め: ご守護と感じた場面、教会や信仰が支えになった点。");
+        }
+        if (!emailLooksValid()) {
+          gaps.push("連絡先確認: メールアドレスが @ を含む形式か確認が必要です。");
+        }
+        if (modeInput.value === "recommend" && !permission.checked) {
+          gaps.push("推薦投稿の確認: ご本人の了承が取れているか。");
+        }
+
+        if (!gaps.length) {
+          gaps.push("大きな不足は少ないですが、聞き取り時に会話・表情・掲載時の匿名希望を確認すると安心です。");
+        }
+        return gaps;
+      }
+
+      function buildEditorFollowups() {
+        const signals = editorialSignals();
+        const questions = [];
+
+        if (signals.daughter) {
+          questions.push("娘さんは、いつ、どこで、どんな表情でその言葉を言いましたか。");
+        } else if (!signals.quote) {
+          questions.push("その場で心に残った言葉があれば、できるだけ実際の言い方で聞きたいです。");
+        }
+        if (signals.illness) {
+          questions.push("病気が分かった時期、治療中に一番つらかったこと、仕事や家庭で困ったことは何でしたか。");
+        }
+        if (signals.family) {
+          questions.push("その出来事の前後で、家族との時間や接し方は具体的にどう変わりましたか。");
+        }
+        if (!signals.faithWord || value("faith").length < 40) {
+          questions.push("今ふり返って、どの場面をご守護と感じますか。教会や信仰に支えられたことはありましたか。");
+        }
+        if (value("change").length < 50) {
+          questions.push("その後、日常生活・仕事・教会で実際に変えた行動はありますか。");
+        }
+        questions.push("掲載時に伏せたい名前、病名、家族関係、時期があるか確認したいです。");
+        if (modeInput.value === "recommend") {
+          questions.push("推薦者として、この方を全国の読者に知ってほしい一番の理由は何ですか。");
+        }
+
+        return questions.slice(0, 6);
+      }
+
       function updateSummary() {
         const currentScore = score();
         meterBar.style.width = `${currentScore}%`;
@@ -1540,15 +1698,24 @@
           .filter(Boolean)
           .join("\n");
         document.getElementById("editorMemo").textContent = summarize();
-        document.getElementById("editorQuestions").textContent = buildQuestions()
+        document.getElementById("editorDiagnosis").textContent = buildEditorialDiagnosis();
+        document.getElementById("editorGaps").textContent = buildEditorialGaps()
+          .map((item, index) => `${index + 1}. ${item}`)
+          .join("\n");
+        document.getElementById("editorQuestions").textContent = buildEditorFollowups()
           .map((item, index) => `${index + 1}. ${item}`)
           .join("\n");
         document.getElementById("editorFit").textContent =
-          score() >= 78 ? "詳しく確認しやすい" : score() >= 48 ? "追加情報があると確認しやすい" : "もう少し具体的に追記できます";
+          editorialScore() >= 75
+            ? "素材あり。聞き取りで誌面化を検討できる"
+            : editorialScore() >= 48
+              ? "核はあるが、代表場面の聞き取りが必要"
+              : "素材の入口をもう少し確認したい";
 
         const warnings = [];
         if (!value("theme")) warnings.push("テーマが未選択です。");
         if (!value("phone") && !value("email")) warnings.push("電話番号またはメールアドレスが未入力です。");
+        if (!emailLooksValid()) warnings.push("メールアドレスの形式を確認してください。");
         if (modeInput.value === "recommend" && !permission.checked) {
           warnings.push("推薦投稿では本人了承の確認が必要です。");
         }
