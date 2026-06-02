@@ -386,11 +386,11 @@
       }
 
       .layout {
-        max-width: 1180px;
+        max-width: 920px;
         margin: 0 auto;
         padding: 14px 18px 40px;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 390px;
+        grid-template-columns: minmax(0, 1fr);
         gap: 22px;
         align-items: start;
       }
@@ -616,11 +616,15 @@
 
       .actions {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: minmax(0, 1fr);
         gap: 10px;
       }
 
-      .btn {
+      .btn,
+      a.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         min-height: 48px;
         border: 1px solid var(--line);
         border-radius: 8px;
@@ -628,6 +632,8 @@
         color: var(--ink);
         padding: 10px 12px;
         font-weight: 700;
+        text-align: center;
+        text-decoration: none;
       }
 
       .btn.primary {
@@ -760,6 +766,26 @@
         display: block;
       }
 
+      .editor-head {
+        margin-bottom: 14px;
+        border: 1px solid rgba(45, 116, 109, 0.2);
+        border-radius: 8px;
+        background: var(--soft);
+        padding: 16px;
+      }
+
+      .editor-head h2 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.4;
+      }
+
+      .editor-head p {
+        margin: 8px 0 0;
+        color: #355651;
+        font-size: 14px;
+      }
+
       .editor-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -791,6 +817,13 @@
         margin: 0;
         font-size: 14px;
         white-space: pre-wrap;
+      }
+
+      .editor-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
       }
 
       @media (max-width: 920px) {
@@ -901,6 +934,10 @@
           grid-template-columns: 1fr;
         }
 
+        .editor-actions {
+          grid-template-columns: 1fr;
+        }
+
         .choice {
           min-height: 68px;
         }
@@ -918,7 +955,7 @@
           <small>試作品</small>
           <strong>『陽気』特集 体験談募集・推薦フォーム</strong>
         </div>
-        <a class="jump" href="#summary">整理を見る</a>
+        <a class="jump" href="#storyForm">入力する</a>
       </div>
     </header>
 
@@ -964,11 +1001,11 @@
         </div>
         <div class="hero-actions" aria-label="投稿方法への移動">
           <a class="hero-action primary" href="#storyForm">体験談を入力する</a>
-          <a class="hero-action" href="#summary">入力内容の整理を見る</a>
+          <a class="hero-action" href="#flow">投稿後の流れを見る</a>
         </div>
       </section>
 
-      <section class="intro-band" aria-label="募集の説明">
+      <section class="intro-band" id="flow" aria-label="募集の説明">
         <div class="intro-grid">
           <div class="intro-panel">
             <h2>完成原稿でなくても大丈夫です</h2>
@@ -1099,6 +1136,7 @@
             </div>
             <p class="lead">
               文章として整っていなくても大丈夫です。電話で話すように、思い出す順番で入れてください。
+              迷ったら各項目の例を押してください。その欄に追記され、今までの入力は消えません。
             </p>
 
             <div class="prompt-card">
@@ -1190,26 +1228,25 @@
 
           <section class="section">
             <div class="section-head">
-              <h2>確認</h2>
+              <h2>入力内容の確認へ</h2>
               <span class="step">5 / 5</span>
             </div>
             <p class="lead">
-              この試作品では実際の送信は行いません。下の整理結果を見て、編集部が確認しやすい形になっているか確認できます。
+              ここまで入力できたら、確認画面へ進みます。まだ送信されません。
+              足りないと思ったところだけ戻って追記できます。
             </p>
             <p class="submit-note">
               実際に運用する際は、投稿いただいた内容を編集部が拝見し、必要に応じて後日ご連絡します。
               投稿はご連絡や掲載をお約束するものではありません。
             </p>
             <div class="actions">
-              <button class="btn secondary" type="button" id="sampleBtn">入力例を入れる</button>
-              <button class="btn" type="button" id="clearBtn">入力を消す</button>
-              <button class="btn primary" type="button" id="submitBtn">送信内容を確認</button>
+              <button class="btn primary" type="button" id="submitBtn">確認画面へ進む</button>
             </div>
             <div class="notice" id="notice"></div>
           </section>
         </form>
 
-        <aside class="panel summary" id="summary">
+        <aside class="panel summary" id="summary" hidden>
           <h2>入力内容の整理</h2>
           <div class="meter" aria-label="入力の充実度">
             <span id="meterBar"></span>
@@ -1230,13 +1267,20 @@
           </div>
 
           <div class="summary-block">
-            <h3>追加で聞きたいこと</h3>
+            <h3>足せるとよいこと</h3>
             <ul id="questions"></ul>
           </div>
         </aside>
       </div>
 
       <section class="editor-view" id="editorView">
+        <div class="editor-head">
+          <h2>確認画面</h2>
+          <p>
+            入力内容を整理しました。足りないと思ったところだけ、入力画面に戻って追記できます。
+            1から入れ直す必要はありません。
+          </p>
+        </div>
         <div class="editor-grid">
           <article class="editor-card">
             <h3>投稿の種類</h3>
@@ -1251,18 +1295,23 @@
             <p id="editorContact"></p>
           </article>
           <article class="editor-card wide">
-            <h3>編集部メモ</h3>
+            <h3>入力内容の整理</h3>
             <p id="editorMemo"></p>
           </article>
           <article class="editor-card">
-            <h3>編集部で確認する目安</h3>
+            <h3>確認の目安</h3>
             <p id="editorFit"></p>
           </article>
           <article class="editor-card full">
-            <h3>電話で聞くとよさそうな質問</h3>
+            <h3>足せるとよいこと</h3>
             <p id="editorQuestions"></p>
           </article>
         </div>
+        <div class="editor-actions">
+          <a class="btn secondary" href="#storyForm">入力に戻って追記する</a>
+          <button class="btn primary" type="button" id="finishBtn">この内容で送る（試作品）</button>
+        </div>
+        <div class="notice" id="editorNotice"></div>
       </section>
     </main>
 
@@ -1300,6 +1349,7 @@
       const questions = document.getElementById("questions");
       const notice = document.getElementById("notice");
       const editorView = document.getElementById("editorView");
+      const editorNotice = document.getElementById("editorNotice");
 
       const samples = {
         self: {
@@ -1419,17 +1469,17 @@
 
       function buildQuestions() {
         const list = [];
-        if (!filled("scene")) list.push("いつ頃、どこで、誰がいた場面かをもう少し聞きたい。");
-        if (!filled("event")) list.push("心に残っている言葉や出来事を具体的に聞きたい。");
-        if (!filled("emotion")) list.push("その時どんな気持ちだったかを聞きたい。");
-        if (!filled("change")) list.push("その出来事の後、暮らしや信仰に何が変わったかを聞きたい。");
-        if (!filled("faith")) list.push("今ふり返って、信仰の上でどう受け止めているかを聞きたい。");
+        if (!filled("scene")) list.push("いつ頃、どこで、誰がいた場面かを追記できます。");
+        if (!filled("event")) list.push("心に残っている言葉や出来事を、具体的に追記できます。");
+        if (!filled("emotion")) list.push("その時どんな気持ちだったかを追記できます。");
+        if (!filled("change")) list.push("その出来事の後、暮らしや信仰に何が変わったかを追記できます。");
+        if (!filled("faith")) list.push("今ふり返って、信仰の上でどう受け止めているかを追記できます。");
         if (modeInput.value === "recommend" && !filled("recommendReason")) {
-          list.push("教会として、なぜこの方を推薦したいのかを聞きたい。");
+          list.push("教会として、なぜこの方を推薦したいのかを追記できます。");
         }
         if (!list.length) {
-          list.push("電話では、本文に使える具体的な会話や表情を確認したい。");
-          list.push("掲載時に匿名にしたい人物名や確認が必要な事柄を聞きたい。");
+          list.push("具体的な会話や表情があれば、さらに伝わりやすくなります。");
+          list.push("匿名にしたい人物名や、事前に伝えておきたいことがあれば追記できます。");
         }
         return list;
       }
@@ -1494,7 +1544,7 @@
           .map((item, index) => `${index + 1}. ${item}`)
           .join("\n");
         document.getElementById("editorFit").textContent =
-          score() >= 78 ? "詳しく確認しやすい" : score() >= 48 ? "追加情報があると確認しやすい" : "もう少し具体的に聞きたい";
+          score() >= 78 ? "詳しく確認しやすい" : score() >= 48 ? "追加情報があると確認しやすい" : "もう少し具体的に追記できます";
 
         const warnings = [];
         if (!value("theme")) warnings.push("テーマが未選択です。");
@@ -1503,11 +1553,19 @@
           warnings.push("推薦投稿では本人了承の確認が必要です。");
         }
 
-        notice.textContent = warnings.length
+        notice.classList.remove("show");
+        editorNotice.textContent = warnings.length
           ? warnings.join(" ")
-          : "試作上の確認画面を作成しました。編集部では、このような形で投稿を一覧確認できます。";
-        notice.classList.add("show");
+          : "確認画面です。気になるところがあれば、入力に戻ってその項目だけ追記できます。";
+        editorNotice.classList.add("show");
         editorView.scrollIntoView({ block: "start" });
+      }
+
+      function finishPrototype() {
+        editorNotice.textContent =
+          "試作品のため、ここでは実際の送信は行いません。実運用では、この操作で編集部に内容が送られます。";
+        editorNotice.classList.add("show");
+        editorNotice.scrollIntoView({ block: "center" });
       }
 
       function shorten(text, max) {
@@ -1554,9 +1612,8 @@
         if (el[id]) el[id].addEventListener("change", updateSummary);
       }
       permission.addEventListener("change", updateSummary);
-      document.getElementById("sampleBtn").addEventListener("click", fillSample);
-      document.getElementById("clearBtn").addEventListener("click", clearForm);
       document.getElementById("submitBtn").addEventListener("click", showEditorView);
+      document.getElementById("finishBtn").addEventListener("click", finishPrototype);
 
       updateSummary();
     </script>
