@@ -620,6 +620,19 @@
         gap: 10px;
       }
 
+      .prototype-tools {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .prototype-note {
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
       .btn,
       a.btn {
         display: inline-flex;
@@ -938,7 +951,8 @@
 
         .choice-grid,
         .field-grid,
-        .actions {
+        .actions,
+        .prototype-tools {
           grid-template-columns: 1fr;
         }
 
@@ -1250,6 +1264,11 @@
             <div class="actions">
               <button class="btn primary" type="button" id="submitBtn">確認画面へ進む</button>
             </div>
+            <p class="prototype-note">試作品の確認用です。押すと各項目に入力例が入ります。</p>
+            <div class="prototype-tools" aria-label="試作用の入力例">
+              <button class="btn secondary" type="button" id="sampleSelfBtn">本人投稿の例を入れる</button>
+              <button class="btn secondary" type="button" id="sampleRecommendBtn">推薦投稿の例を入れる</button>
+            </div>
             <div class="notice" id="notice"></div>
           </section>
         </form>
@@ -1381,46 +1400,50 @@
 
       const samples = {
         self: {
-          submitterName: "山田 太郎",
-          daikyokai: "〇〇大教会",
-          church: "〇〇分教会",
+          submitterName: "加藤栄作",
+          daikyokai: "仙台大教会",
+          church: "岩沼分教会",
           phone: "090-0000-0000",
-          email: "yamada@example.com",
+          email: "test@example.com",
           contactTo: "推薦者に連絡",
-          theme: "忘れられない一言",
+          theme: "病気や身上を通して感じたご守護",
           scene:
-            "二十年ほど前、仕事と家族のことで気持ちが落ち込み、教会にも足が向きにくくなっていた時期がありました。月次祭のあと、教会長さんが声をかけてくださいました。",
+            "二年前、胃がんが見つかった時の話です。それまでは会社の仕事が生活の中心で、家族のためと思いながら、朝から晩まで働いていました。病気が分かった時は、自分だけが急に立ち止まらされたような気持ちになりました。",
           event:
-            "その時に『焦らんでええ。今できることを一つずつさせてもらおう』と言われたことが、今でも忘れられません。",
+            "入院前に家で過ごしていた時、娘が「お父さんが病気になったのはつらいけど、こうして家族でゆっくり話せる時間ができたのは、少しありがたいね」と言いました。その一言がとても心に残っています。",
           emotion:
-            "情けない気持ちもありましたが、見捨てられていないように感じて、ほっとして涙が出ました。",
+            "最初は情けない気持ちもありました。家族に迷惑をかけていると思っていました。でも娘の言葉を聞いて、自分は家族のためと言いながら、家族と向き合う時間をあまり持てていなかったのかもしれないと、はっとしました。",
           change:
-            "それから、困っている人に気づいた時は、短い言葉でも声をかけるようになりました。教会にも少しずつ足が向くようになりました。",
+            "退院してからは、仕事だけを優先するのではなく、家族と食事をしたり、話を聞いたりする時間を意識するようになりました。教会にも、以前より落ち着いた心で足を運ぶようになりました。",
           faith:
-            "今ふり返ると、親神様が人を通して支えてくださった出来事だったのではないかと思っています。",
+            "病気になったこと自体は苦しい出来事でしたが、今ふり返ると、家族との関係や自分の心の向きを見直す機会をいただいたように感じています。これも一つのご守護だったのではないかと思っています。",
+          additionalNote:
+            "娘がその言葉を言ったのは、夕食のあと台所で片付けをしていた時でした。少し笑いながら、でも心配そうな顔で話してくれたのを覚えています。あの時の表情が、今も忘れられません。",
         },
         recommend: {
           submitterName: "田中 一郎",
-          daikyokai: "〇〇大教会",
-          church: "〇〇分教会",
-          candidateName: "佐藤 花子さん",
+          daikyokai: "仙台大教会",
+          church: "岩沼分教会",
+          candidateName: "佐藤花子さん",
           relationship: "自教会の信者さん",
           phone: "090-0000-0000",
           email: "tanaka@example.com",
           contactTo: "教会長・教会関係者に連絡",
-          theme: "親・家族から受け継いだ信仰",
+          theme: "忘れられない一言",
           scene:
-            "佐藤さんは高齢でスマホは苦手ですが、若い頃から家族の身上を通して信仰を深めてこられた方です。数年前、教会でその時の話を少し聞かせてくださいました。",
+            "佐藤花子さんは、長年教会の月次祭や行事を陰で支えてこられた方です。数年前、ご主人の身上が続いた時も、弱音をあまり見せずに通っておられました。",
           event:
-            "お母様から『どんな時も、まず親神様に心を向けるんやで』と言われたことを、今も大切にしているそうです。",
+            "ある日、教会で片付けをしている時に、佐藤さんが「困った時ほど、まず今日できるおつとめをさせてもらうんです」と話してくださいました。その言葉がとても印象に残っています。",
           emotion:
-            "当時は苦しく、なぜ自分の家だけがと思ったそうですが、その言葉がずっと心に残っていたと話していました。",
+            "ご本人は何気なく話されましたが、長い間の信仰がその一言に表れているように感じました。聞いていたこちらも、背筋が伸びる思いがしました。",
           change:
-            "その後、ご自身も家族や周囲の人に同じように声をかけるようになり、教会でも陰で人を支える姿が続いています。",
+            "その後も佐藤さんは、教会で困っている人がいると、黙って手を添えるように支えておられます。若い信者さんにも、押しつけずに自然に声をかける姿があります。",
           faith:
-            "本人は大げさに語りませんが、親から受け継いだ信仰が日々の姿に表れているように感じます。",
+            "ご本人は大げさに語りませんが、親神様にもたれて日々を通る信仰の姿が、周りの人を励ましているように感じます。",
+          additionalNote:
+            "佐藤さんは掲載されることを少し遠慮されるかもしれませんが、教会としては、その自然な信仰の姿を全国の読者にも知っていただけたらと思っています。",
           recommendReason:
-            "長年、表に出ることは少ない方ですが、教会の信者さんにとって支えになる存在です。その歩みを『陽気』で紹介できれば、教会にとっても大きな励みになると思います。",
+            "長年、表に出ることは少ない方ですが、教会の信者さんにとって支えになる存在です。その歩みを『陽気』で紹介できれば、同じように日々を通る読者の励みになると思います。",
         },
       };
 
@@ -1961,12 +1984,34 @@
         return compact.length > max ? `${compact.slice(0, max)}…` : compact;
       }
 
-      function fillSample() {
-        const data = samples[modeInput.value];
+      function hasEnteredContent() {
+        return fields.some((id) => id !== "contactTo" && value(id));
+      }
+
+      function resetConfirmationState() {
+        editorView.classList.remove("show");
+        editorNotice.classList.remove("show");
+        const button = document.getElementById("finishBtn");
+        button.disabled = false;
+        button.textContent = "この内容で送る（試作品）";
+      }
+
+      function fillSample(sampleMode = modeInput.value) {
+        if (hasEnteredContent()) {
+          const ok = window.confirm("入力済みの内容を、試作用の入力例に置き換えます。よろしいですか？");
+          if (!ok) return;
+        }
+        setMode(sampleMode);
+        const data = samples[sampleMode];
         for (const [key, val] of Object.entries(data)) {
           if (el[key]) el[key].value = val;
         }
-        if (modeInput.value === "recommend") permission.checked = true;
+        permission.checked = sampleMode === "recommend";
+        notice.textContent = sampleMode === "recommend"
+          ? "推薦投稿の入力例を入れました。確認画面へ進めます。"
+          : "本人投稿の入力例を入れました。確認画面へ進めます。";
+        notice.classList.add("show");
+        resetConfirmationState();
         updateSummary();
       }
 
@@ -2001,6 +2046,8 @@
       }
       permission.addEventListener("change", updateSummary);
       document.getElementById("submitBtn").addEventListener("click", showEditorView);
+      document.getElementById("sampleSelfBtn").addEventListener("click", () => fillSample("self"));
+      document.getElementById("sampleRecommendBtn").addEventListener("click", () => fillSample("recommend"));
       document.getElementById("refreshDiagnosisBtn").addEventListener("click", showEditorView);
       document.getElementById("finishBtn").addEventListener("click", finishPrototype);
 
