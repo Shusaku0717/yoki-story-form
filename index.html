@@ -1,0 +1,1562 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>『陽気』特集 体験談募集・推薦フォーム試作</title>
+    <style>
+      :root {
+        --ink: #253330;
+        --muted: #64716d;
+        --line: #e7d9cc;
+        --paper: #fffdfa;
+        --base: #fff7ee;
+        --soft: #edf7f1;
+        --teal: #2d746d;
+        --teal-dark: #20534f;
+        --rose: #ad4f66;
+        --gold: #a9762f;
+        --shadow: 0 18px 42px rgba(77, 54, 36, 0.11);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 84px;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(255, 247, 238, 0.94), rgba(244, 250, 246, 0.92)),
+          radial-gradient(circle at 14% 0%, rgba(173, 79, 102, 0.1), transparent 28%);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Hiragino Sans", "Yu Gothic", "YuGothic", "Noto Sans JP", sans-serif;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid rgba(231, 217, 204, 0.9);
+        background: rgba(255, 253, 250, 0.92);
+        backdrop-filter: blur(14px);
+      }
+
+      .topbar-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 13px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand small {
+        display: block;
+        color: var(--rose);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0;
+      }
+
+      .brand strong {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 16px;
+        line-height: 1.35;
+      }
+
+      .jump {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        border: 1px solid var(--teal);
+        border-radius: 8px;
+        color: var(--teal);
+        background: #fff;
+        padding: 8px 12px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .hero {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 22px 18px 14px;
+      }
+
+      .hero-visual {
+        display: block;
+        width: 100%;
+      }
+
+      .hero-visual picture,
+      .hero-visual img {
+        display: block;
+        width: 100%;
+      }
+
+      .hero-visual img {
+        height: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffdfa;
+        box-shadow: var(--shadow);
+      }
+
+      .mobile-hero-composed {
+        display: none;
+      }
+
+      .mobile-hero-photo {
+        position: absolute;
+        inset: auto 0 0;
+        height: 300px;
+        background-image: url("assets/yoki-hero-people-bg.png");
+        background-repeat: no-repeat;
+        background-size: 610px auto;
+        background-position: 72% calc(100% + 112px);
+        opacity: 0.72;
+        pointer-events: none;
+      }
+
+      .mobile-hero-veil {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(255, 250, 243, 0.99) 0%, rgba(255, 250, 243, 0.98) 68%, rgba(255, 250, 243, 0.72) 85%, rgba(255, 250, 243, 0.18) 100%),
+          radial-gradient(circle at 10% 18%, rgba(173, 79, 102, 0.09), transparent 32%),
+          radial-gradient(circle at 90% 88%, rgba(45, 116, 109, 0.1), transparent 28%);
+        pointer-events: none;
+      }
+
+      .mobile-hero-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .mobile-logo-slip {
+        display: grid;
+        grid-template-columns: 116px minmax(0, 1fr);
+        align-items: center;
+        gap: 12px;
+        max-width: 100%;
+        border: 1px solid rgba(169, 118, 47, 0.22);
+        border-radius: 8px;
+        background: rgba(255, 253, 248, 0.88);
+        padding: 10px 12px;
+        box-shadow: 0 12px 26px rgba(86, 64, 45, 0.08);
+      }
+
+      .mobile-logo-slip img {
+        display: block;
+        width: 116px;
+        height: 70px;
+        object-fit: contain;
+      }
+
+      .mobile-logo-slip span {
+        color: #80664b;
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 1.45;
+      }
+
+      .mobile-hero-chip {
+        display: inline-block;
+        margin-top: 22px;
+        border-radius: 999px;
+        background: rgba(183, 101, 114, 0.17);
+        color: #83565c;
+        padding: 9px 16px;
+        font-size: 23px;
+        font-weight: 600;
+        line-height: 1.35;
+      }
+
+      .mobile-hero-title {
+        margin: 26px 0 0;
+        color: #3f3933;
+        font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+        font-size: 52px;
+        font-weight: 600;
+        letter-spacing: 0;
+        line-height: 1.2;
+      }
+
+      .mobile-hero-title span {
+        background: linear-gradient(transparent 68%, rgba(232, 170, 167, 0.36) 68%);
+      }
+
+      .mobile-hero-lead {
+        margin: 24px 0 0;
+        color: #6f625b;
+        font-size: 24px;
+        line-height: 1.8;
+      }
+
+      .mobile-hero-points {
+        display: grid;
+        gap: 10px;
+        width: fit-content;
+        margin: 24px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .mobile-hero-points li {
+        border: 1px solid rgba(207, 188, 171, 0.72);
+        border-radius: 999px;
+        background: rgba(255, 253, 248, 0.92);
+        padding: 8px 15px;
+        color: #5f544d;
+        font-size: 22px;
+        font-weight: 600;
+        line-height: 1.45;
+      }
+
+      .mobile-hero-note {
+        display: inline-block;
+        margin-top: 24px;
+        border-radius: 8px;
+        background: rgba(255, 253, 248, 0.88);
+        padding: 9px 13px;
+        color: #6f625b;
+        font-size: 20px;
+        line-height: 1.6;
+      }
+
+      .hero-kicker {
+        margin: 0 0 10px;
+        color: var(--rose);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .hero h1 {
+        margin: 0;
+        max-width: 920px;
+        font-size: clamp(28px, 5.6vw, 44px);
+        font-weight: 700;
+        line-height: 1.22;
+        letter-spacing: 0;
+      }
+
+      .hero p {
+        max-width: 780px;
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .hero-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        border: 1px solid var(--teal);
+        border-radius: 8px;
+        padding: 10px 16px;
+        color: var(--teal-dark);
+        background: #fff;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .hero-action.primary {
+        border-color: var(--rose);
+        background: var(--rose);
+        color: #fff;
+      }
+
+      .intro-band {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 18px 8px;
+      }
+
+      .intro-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .intro-panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 253, 250, 0.96);
+        padding: 16px;
+      }
+
+      .intro-panel h2 {
+        margin: 0 0 8px;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      .intro-panel p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .intro-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .intro-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .intro-list li {
+        display: flex;
+        gap: 9px;
+        color: var(--ink);
+        font-size: 14px;
+      }
+
+      .intro-list li::before {
+        content: "";
+        flex: 0 0 8px;
+        width: 8px;
+        height: 8px;
+        margin-top: 0.68em;
+        border-radius: 999px;
+        background: var(--gold);
+      }
+
+      .flow-diagram {
+        display: block;
+        width: 100%;
+        margin-top: 14px;
+      }
+
+      .flow-diagram picture,
+      .flow-diagram img {
+        display: block;
+        width: 100%;
+      }
+
+      .flow-diagram img {
+        height: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fffdfa;
+      }
+
+      .layout {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 14px 18px 40px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 390px;
+        gap: 22px;
+        align-items: start;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 253, 250, 0.96);
+        box-shadow: var(--shadow);
+      }
+
+      .form-panel {
+        overflow: hidden;
+      }
+
+      .section {
+        padding: 22px;
+        border-top: 1px solid var(--line);
+      }
+
+      .section:first-child {
+        border-top: 0;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+
+      .section h2,
+      .summary h2 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      .step {
+        color: var(--gold);
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .lead {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .choice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .choice {
+        min-height: 78px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        padding: 12px;
+        text-align: left;
+      }
+
+      .choice strong {
+        display: block;
+        font-size: 16px;
+        line-height: 1.35;
+      }
+
+      .choice span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .choice.active {
+        border-color: var(--teal);
+        background: var(--soft);
+        box-shadow: inset 0 0 0 1px var(--teal);
+      }
+
+      label {
+        display: block;
+        color: #3d4a46;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .hint {
+        margin: 7px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .field,
+      .wide {
+        min-width: 0;
+      }
+
+      .wide {
+        grid-column: 1 / -1;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        margin-top: 7px;
+        border: 1px solid #daccc1;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        padding: 12px 13px;
+        outline: none;
+      }
+
+      input,
+      select {
+        min-height: 48px;
+      }
+
+      textarea {
+        display: block;
+        min-height: 116px;
+        resize: vertical;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(45, 116, 109, 0.12);
+      }
+
+      .prompt-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        padding: 15px;
+      }
+
+      .prompt-card + .prompt-card {
+        margin-top: 12px;
+      }
+
+      .prompt-title {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--teal);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .prompt-title strong {
+        display: block;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.45;
+      }
+
+      .examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0 0;
+      }
+
+      .chip {
+        border: 1px solid #ddcdbd;
+        border-radius: 999px;
+        background: #fff9f1;
+        color: #514039;
+        padding: 7px 10px;
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .chip:hover {
+        border-color: var(--rose);
+      }
+
+      .consent {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff9f1;
+        padding: 12px;
+      }
+
+      .consent input {
+        width: 20px;
+        min-height: 20px;
+        margin: 4px 0 0;
+        flex: 0 0 auto;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .btn {
+        min-height: 48px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        padding: 10px 12px;
+        font-weight: 700;
+      }
+
+      .btn.primary {
+        border-color: var(--rose);
+        background: var(--rose);
+        color: #fff;
+      }
+
+      .btn.secondary {
+        border-color: var(--teal);
+        color: var(--teal);
+      }
+
+      .btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .summary {
+        position: sticky;
+        top: 82px;
+        padding: 18px;
+      }
+
+      #storyForm,
+      #summary {
+        scroll-margin-top: 92px;
+      }
+
+      .meter {
+        margin: 14px 0 18px;
+        height: 12px;
+        border-radius: 999px;
+        background: #f0e5dc;
+        overflow: hidden;
+      }
+
+      .meter span {
+        display: block;
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--teal), var(--rose));
+        transition: width 0.2s ease;
+      }
+
+      .verdict {
+        border: 1px solid rgba(45, 116, 109, 0.22);
+        border-radius: 8px;
+        background: var(--soft);
+        padding: 13px;
+      }
+
+      .verdict strong {
+        display: block;
+        color: var(--teal-dark);
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .verdict p {
+        margin: 4px 0 0;
+        color: #3e5d58;
+        font-size: 14px;
+      }
+
+      .summary-block {
+        margin-top: 16px;
+      }
+
+      .summary-block h3 {
+        margin: 0 0 7px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .summary-block p,
+      .summary-block li {
+        color: var(--ink);
+        font-size: 14px;
+      }
+
+      .summary-block p {
+        margin: 0;
+      }
+
+      .summary-block ul {
+        margin: 0;
+        padding-left: 1.25em;
+      }
+
+      .output {
+        white-space: pre-wrap;
+      }
+
+      .notice {
+        display: none;
+        margin-top: 12px;
+        border: 1px solid rgba(173, 79, 102, 0.25);
+        border-radius: 8px;
+        background: #fff4f6;
+        color: #683342;
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .notice.show {
+        display: block;
+      }
+
+      .submit-note {
+        margin: 14px 0 0;
+        border: 1px solid rgba(45, 116, 109, 0.2);
+        border-radius: 8px;
+        background: var(--soft);
+        color: #355651;
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      .editor-view {
+        display: none;
+        max-width: 1180px;
+        margin: 0 auto 44px;
+        padding: 0 18px;
+      }
+
+      .editor-view.show {
+        display: block;
+      }
+
+      .editor-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .editor-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        padding: 16px;
+      }
+
+      .editor-card.wide {
+        grid-column: span 2;
+      }
+
+      .editor-card.full {
+        grid-column: 1 / -1;
+      }
+
+      .editor-card h3 {
+        margin: 0 0 8px;
+        color: var(--rose);
+        font-size: 15px;
+      }
+
+      .editor-card p {
+        margin: 0;
+        font-size: 14px;
+        white-space: pre-wrap;
+      }
+
+      @media (max-width: 920px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .summary {
+          position: static;
+        }
+
+        .editor-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .editor-card.wide {
+          grid-column: auto;
+        }
+      }
+
+      @media (max-width: 640px) {
+        html {
+          scroll-padding-top: 0;
+        }
+
+        .topbar {
+          position: static;
+        }
+
+        .topbar-inner {
+          padding: 11px 14px;
+        }
+
+        .brand strong {
+          font-size: 14px;
+        }
+
+        .jump {
+          min-height: 38px;
+          padding: 7px 10px;
+          font-size: 13px;
+        }
+
+        .hero {
+          max-width: none;
+          padding: 0 0 14px;
+        }
+
+        .hero-visual picture {
+          display: none;
+        }
+
+        #storyForm,
+        #summary {
+          scroll-margin-top: 16px;
+        }
+
+        .mobile-hero-composed {
+          position: relative;
+          display: block;
+          overflow: hidden;
+          min-height: 760px;
+          background: #fffaf3;
+          padding: 28px 24px 236px;
+        }
+
+        .intro-band {
+          max-width: none;
+          padding: 0 0 8px;
+        }
+
+        .intro-panel {
+          margin: 0 14px;
+        }
+
+        .hero-action {
+          width: 100%;
+          min-height: 88px;
+          border-radius: 12px;
+          padding: 18px 18px;
+          font-size: 24px;
+        }
+
+        .hero-actions {
+          margin-right: 14px;
+          margin-left: 14px;
+        }
+
+        .flow-diagram img {
+          border: 0;
+          border-radius: 0;
+        }
+
+        .layout {
+          padding: 10px 14px 32px;
+          gap: 16px;
+        }
+
+        .section {
+          padding: 18px 14px;
+        }
+
+        .choice-grid,
+        .field-grid,
+        .actions {
+          grid-template-columns: 1fr;
+        }
+
+        .choice {
+          min-height: 68px;
+        }
+
+        textarea {
+          min-height: 128px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <small>試作品</small>
+          <strong>『陽気』特集 体験談募集・推薦フォーム</strong>
+        </div>
+        <a class="jump" href="#summary">整理を見る</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-visual" aria-label="心に残る体験談を募集しています">
+          <picture>
+            <source
+              media="(max-width: 640px)"
+              srcset="assets/yoki-hero-flyer-mobile.png?v=202606021158"
+            />
+            <img
+              src="assets/yoki-hero-flyer-desktop.png?v=202606021158"
+              alt="月刊誌『陽気』特集 体験談募集。心に残る体験談を募集しています。忘れられない言葉、支えられた出来事、家族から受け継いだ信仰。ご本人の体験でも、教会関係者からのご推薦でもかまいません。完成原稿でなくても大丈夫。スマホから入力できます。編集部が特集記事の候補として大切に拝見します。"
+              loading="eager"
+            />
+          </picture>
+          <div class="mobile-hero-composed" aria-hidden="true">
+            <div class="mobile-hero-photo"></div>
+            <div class="mobile-hero-veil"></div>
+            <div class="mobile-hero-content">
+              <div class="mobile-logo-slip">
+                <img src="assets/yoki-logo-transparent-mark.png" alt="" />
+                <span>月刊誌『陽気』の<br />特集記事につながる募集です</span>
+              </div>
+              <p class="mobile-hero-chip">月刊誌『陽気』特集 体験談募集</p>
+              <h1 class="mobile-hero-title">
+                <span>心に残る<br />体験談を<br />募集しています</span>
+              </h1>
+              <p class="mobile-hero-lead">
+                忘れられない言葉、支えられた出来事、家族から受け継いだ信仰。
+                ご本人の体験でも、教会関係者からのご推薦でもかまいません。
+              </p>
+              <ul class="mobile-hero-points">
+                <li>完成原稿でなくても大丈夫</li>
+                <li>スマホから入力できます</li>
+              </ul>
+              <p class="mobile-hero-note">
+                編集部が特集記事の候補として大切に拝見します。
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="hero-actions" aria-label="投稿方法への移動">
+          <a class="hero-action primary" href="#storyForm">体験談を入力する</a>
+          <a class="hero-action" href="#summary">入力内容の整理を見る</a>
+        </div>
+      </section>
+
+      <section class="intro-band" aria-label="募集の説明">
+        <div class="intro-grid">
+          <div class="intro-panel">
+            <h2>完成原稿でなくても大丈夫です</h2>
+            <ul class="intro-list">
+              <li>ご自身の心に残っている体験を、そのままの言葉で入力できます。</li>
+              <li>教会長さん・教会関係者が、紹介したい方を推薦することもできます。</li>
+              <li>お寄せいただいた内容は、編集部が特集記事の候補として大切に拝見します。</li>
+            </ul>
+          </div>
+          <div class="flow-diagram" aria-label="お預かりした体験談の流れ">
+            <picture>
+              <source
+                media="(max-width: 640px)"
+                srcset="assets/editorial-flow-diagram-mobile-v3.png?v=202606021158"
+              />
+              <img
+                src="assets/editorial-flow-diagram-desktop-v3.png?v=202606021158"
+                alt="お預かりした体験談の流れ。フォームに入力、編集部で確認します、必要に応じてお話を伺います、誌面への掲載を検討します。すべての方へのご連絡・掲載をお約束するものではありません。"
+                loading="eager"
+              />
+            </picture>
+          </div>
+        </div>
+      </section>
+
+      <div class="layout">
+        <form class="panel form-panel" id="storyForm">
+          <section class="section">
+            <div class="section-head">
+              <h2>投稿の形</h2>
+              <span class="step">1 / 5</span>
+            </div>
+            <p class="lead">
+              ご本人の体験を送る場合と、教会の方を推薦する場合で、聞く内容が少し変わります。
+            </p>
+            <div class="choice-grid" role="group" aria-label="投稿の形">
+              <button class="choice active" type="button" data-mode="self">
+                <strong>ご本人の投稿</strong>
+                <span>自分の体験談を送る</span>
+              </button>
+              <button class="choice" type="button" data-mode="recommend">
+                <strong>教会関係者の推薦</strong>
+                <span>信者さんの話を聞いて送る</span>
+              </button>
+            </div>
+            <input type="hidden" id="mode" value="self" />
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <h2>連絡先と確認</h2>
+              <span class="step">2 / 5</span>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="submitterName">入力する方のお名前</label>
+                <input id="submitterName" autocomplete="name" placeholder="例：山田 太郎" />
+              </div>
+              <div class="field">
+                <label for="daikyokai">大教会</label>
+                <input id="daikyokai" placeholder="例：〇〇大教会" />
+              </div>
+              <div class="field">
+                <label for="church">所属教会</label>
+                <input id="church" placeholder="例：〇〇分教会" />
+              </div>
+              <div class="field recommend-only" hidden>
+                <label for="candidateName">推薦したい方のお名前</label>
+                <input id="candidateName" placeholder="例：佐藤 花子さん" />
+              </div>
+              <div class="field recommend-only" hidden>
+                <label for="relationship">推薦する方との関係</label>
+                <input id="relationship" placeholder="例：自教会の信者さん、婦人会の方" />
+              </div>
+              <div class="field">
+                <label for="phone">電話番号</label>
+                <input id="phone" inputmode="tel" autocomplete="tel" placeholder="例：090-0000-0000" />
+              </div>
+              <div class="field">
+                <label for="email">メールアドレス</label>
+                <input id="email" inputmode="email" autocomplete="email" placeholder="例：example@example.com" />
+              </div>
+              <div class="field recommend-only" hidden>
+                <label for="contactTo">聞き取りの連絡先</label>
+                <select id="contactTo">
+                  <option value="推薦者に連絡">まず推薦者に連絡</option>
+                  <option value="体験者本人に連絡">体験者本人に直接連絡してよい</option>
+                  <option value="教会長・教会関係者に連絡">教会長・教会関係者に連絡</option>
+                </select>
+                <p class="hint">推薦投稿の場合、後日お話を伺う際にどなたへ連絡すればよいかを確認します。</p>
+              </div>
+              <div class="wide recommend-only" hidden>
+                <label class="consent">
+                  <input id="permission" type="checkbox" />
+                  <span>
+                    推薦されるご本人に、編集部へ体験談候補として送ることを了承いただいています。
+                  </span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <h2>体験に近い特集テーマ</h2>
+              <span class="step">3 / 5</span>
+            </div>
+            <label for="theme">この体験は、どのテーマに近そうですか</label>
+            <select id="theme">
+              <option value="">選んでください</option>
+              <option>忘れられない一言</option>
+              <option>好きなことをおたすけに</option>
+              <option>病気や身上を通して感じたご守護</option>
+              <option>親・家族から受け継いだ信仰</option>
+              <option>仕事や地域の中で感じた信仰</option>
+              <option>教会生活で心に残っている出来事</option>
+              <option>迷いの中で支えられたこと</option>
+            </select>
+            <p class="hint">
+              ぴったりでなくて構いません。あとで編集部が別のテーマに合うと判断することもあります。
+            </p>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <h2>心に残っている体験について</h2>
+              <span class="step">4 / 5</span>
+            </div>
+            <p class="lead">
+              文章として整っていなくても大丈夫です。電話で話すように、思い出す順番で入れてください。
+            </p>
+
+            <div class="prompt-card">
+              <div class="prompt-title">
+                <span class="num">1</span>
+                <div>
+                  <strong>どんな場面の話ですか</strong>
+                  <p class="hint">いつ頃、どこで、誰がいて、何が起きたか。</p>
+                </div>
+              </div>
+              <div class="examples" data-target="scene">
+                <button class="chip" type="button">二十年ほど前、病気で気持ちが沈んでいた頃</button>
+                <button class="chip" type="button">仕事で叱られて、どうしてよいか分からなかった時</button>
+                <button class="chip" type="button">教会の行事で、ある方の姿を見た時</button>
+              </div>
+              <textarea id="scene" placeholder="例：二十年ほど前、入院していた時に、教会長さんが何度も顔を見に来てくださいました。"></textarea>
+            </div>
+
+            <div class="prompt-card">
+              <div class="prompt-title">
+                <span class="num">2</span>
+                <div>
+                  <strong>心に残っている言葉や出来事は何ですか</strong>
+                  <p class="hint">一言、表情、態度、してもらったことなど。</p>
+                </div>
+              </div>
+              <div class="examples" data-target="event">
+                <button class="chip" type="button">「焦らんでええ」と言われたこと</button>
+                <button class="chip" type="button">黙って手を合わせてくれた姿</button>
+                <button class="chip" type="button">自分では普通のつもりだったことを喜ばれたこと</button>
+              </div>
+              <textarea id="event" placeholder="例：その時に『焦らんでええ。今できることを一つずつさせてもらおう』と言われたことが忘れられません。"></textarea>
+            </div>
+
+            <div class="prompt-card">
+              <div class="prompt-title">
+                <span class="num">3</span>
+                <div>
+                  <strong>その時、どんな気持ちでしたか</strong>
+                  <p class="hint">うれしい、悔しい、恥ずかしい、申し訳ない、ありがたいなど。</p>
+                </div>
+              </div>
+              <div class="examples" data-target="emotion">
+                <button class="chip" type="button">ほっとして涙が出た</button>
+                <button class="chip" type="button">情けなくて、でもありがたかった</button>
+                <button class="chip" type="button">自分の不足に気づかされた</button>
+              </div>
+              <textarea id="emotion" placeholder="例：その時は、情けない気持ちと、見捨てられていないというありがたさが一緒に込み上げました。"></textarea>
+            </div>
+
+            <div class="prompt-card">
+              <div class="prompt-title">
+                <span class="num">4</span>
+                <div>
+                  <strong>その後、ご自身の中で何が変わりましたか</strong>
+                  <p class="hint">信仰、家族、教会、仕事、人との接し方など。</p>
+                </div>
+              </div>
+              <div class="examples" data-target="change">
+                <button class="chip" type="button">人の話を最後まで聞くようになった</button>
+                <button class="chip" type="button">月次祭に足を運ぶようになった</button>
+                <button class="chip" type="button">自分も誰かに声をかけたいと思った</button>
+              </div>
+              <textarea id="change" placeholder="例：それから、困っている人に気づいた時は、短い言葉でも声をかけるようになりました。"></textarea>
+            </div>
+
+            <div class="prompt-card">
+              <div class="prompt-title">
+                <span class="num">5</span>
+                <div>
+                  <strong>今ふり返ると、その出来事をどう受け止めていますか</strong>
+                  <p class="hint">無理に立派な言葉にしなくて大丈夫です。</p>
+                </div>
+              </div>
+              <textarea id="faith" placeholder="例：親神様が、人を通して支えてくださった出来事だったのではないかと思っています。"></textarea>
+            </div>
+
+            <div class="prompt-card recommend-only" hidden>
+              <div class="prompt-title">
+                <span class="num">6</span>
+                <div>
+                  <strong>なぜこの方を推薦したいと思いましたか</strong>
+                  <p class="hint">教会から見たその方の姿、信仰の歩み、周囲への影響など。</p>
+                </div>
+              </div>
+              <textarea id="recommendReason" placeholder="例：長年、表に出ることは少ない方ですが、教会の節目には必ず陰で動いてくださり、その信仰の姿を多くの方に知っていただきたいと思いました。"></textarea>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <h2>確認</h2>
+              <span class="step">5 / 5</span>
+            </div>
+            <p class="lead">
+              この試作品では実際の送信は行いません。下の整理結果を見て、編集部が確認しやすい形になっているか確認できます。
+            </p>
+            <p class="submit-note">
+              実際に運用する際は、投稿いただいた内容を編集部が拝見し、必要に応じて後日ご連絡します。
+              投稿はご連絡や掲載をお約束するものではありません。
+            </p>
+            <div class="actions">
+              <button class="btn secondary" type="button" id="sampleBtn">入力例を入れる</button>
+              <button class="btn" type="button" id="clearBtn">入力を消す</button>
+              <button class="btn primary" type="button" id="submitBtn">送信内容を確認</button>
+            </div>
+            <div class="notice" id="notice"></div>
+          </section>
+        </form>
+
+        <aside class="panel summary" id="summary">
+          <h2>入力内容の整理</h2>
+          <div class="meter" aria-label="入力の充実度">
+            <span id="meterBar"></span>
+          </div>
+          <div class="verdict">
+            <strong id="verdictTitle">もう少し具体的な場面があると整理しやすくなります</strong>
+            <p id="verdictText">場面、心に残った出来事、その後の変化が入ると、話の概要が見えてきます。</p>
+          </div>
+
+          <div class="summary-block">
+            <h3>話の概要</h3>
+            <p class="output" id="summaryText">まだ概要を作れません。</p>
+          </div>
+
+          <div class="summary-block">
+            <h3>中心になりそうな場面</h3>
+            <p class="output" id="centralScene">未入力です。</p>
+          </div>
+
+          <div class="summary-block">
+            <h3>追加で聞きたいこと</h3>
+            <ul id="questions"></ul>
+          </div>
+        </aside>
+      </div>
+
+      <section class="editor-view" id="editorView">
+        <div class="editor-grid">
+          <article class="editor-card">
+            <h3>投稿の種類</h3>
+            <p id="editorMode"></p>
+          </article>
+          <article class="editor-card">
+            <h3>テーマ候補</h3>
+            <p id="editorTheme"></p>
+          </article>
+          <article class="editor-card">
+            <h3>連絡先</h3>
+            <p id="editorContact"></p>
+          </article>
+          <article class="editor-card wide">
+            <h3>編集部メモ</h3>
+            <p id="editorMemo"></p>
+          </article>
+          <article class="editor-card">
+            <h3>編集部で確認する目安</h3>
+            <p id="editorFit"></p>
+          </article>
+          <article class="editor-card full">
+            <h3>電話で聞くとよさそうな質問</h3>
+            <p id="editorQuestions"></p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const fields = [
+        "submitterName",
+        "daikyokai",
+        "church",
+        "candidateName",
+        "relationship",
+        "phone",
+        "email",
+        "contactTo",
+        "theme",
+        "scene",
+        "event",
+        "emotion",
+        "change",
+        "faith",
+        "recommendReason",
+      ];
+
+      const el = Object.fromEntries(
+        fields.map((id) => [id, document.getElementById(id)])
+      );
+      const modeInput = document.getElementById("mode");
+      const modeButtons = document.querySelectorAll("[data-mode]");
+      const recommendOnly = document.querySelectorAll(".recommend-only");
+      const permission = document.getElementById("permission");
+      const meterBar = document.getElementById("meterBar");
+      const verdictTitle = document.getElementById("verdictTitle");
+      const verdictText = document.getElementById("verdictText");
+      const summaryText = document.getElementById("summaryText");
+      const centralScene = document.getElementById("centralScene");
+      const questions = document.getElementById("questions");
+      const notice = document.getElementById("notice");
+      const editorView = document.getElementById("editorView");
+
+      const samples = {
+        self: {
+          submitterName: "山田 太郎",
+          daikyokai: "〇〇大教会",
+          church: "〇〇分教会",
+          phone: "090-0000-0000",
+          email: "yamada@example.com",
+          contactTo: "推薦者に連絡",
+          theme: "忘れられない一言",
+          scene:
+            "二十年ほど前、仕事と家族のことで気持ちが落ち込み、教会にも足が向きにくくなっていた時期がありました。月次祭のあと、教会長さんが声をかけてくださいました。",
+          event:
+            "その時に『焦らんでええ。今できることを一つずつさせてもらおう』と言われたことが、今でも忘れられません。",
+          emotion:
+            "情けない気持ちもありましたが、見捨てられていないように感じて、ほっとして涙が出ました。",
+          change:
+            "それから、困っている人に気づいた時は、短い言葉でも声をかけるようになりました。教会にも少しずつ足が向くようになりました。",
+          faith:
+            "今ふり返ると、親神様が人を通して支えてくださった出来事だったのではないかと思っています。",
+        },
+        recommend: {
+          submitterName: "田中 一郎",
+          daikyokai: "〇〇大教会",
+          church: "〇〇分教会",
+          candidateName: "佐藤 花子さん",
+          relationship: "自教会の信者さん",
+          phone: "090-0000-0000",
+          email: "tanaka@example.com",
+          contactTo: "教会長・教会関係者に連絡",
+          theme: "親・家族から受け継いだ信仰",
+          scene:
+            "佐藤さんは高齢でスマホは苦手ですが、若い頃から家族の身上を通して信仰を深めてこられた方です。数年前、教会でその時の話を少し聞かせてくださいました。",
+          event:
+            "お母様から『どんな時も、まず親神様に心を向けるんやで』と言われたことを、今も大切にしているそうです。",
+          emotion:
+            "当時は苦しく、なぜ自分の家だけがと思ったそうですが、その言葉がずっと心に残っていたと話していました。",
+          change:
+            "その後、ご自身も家族や周囲の人に同じように声をかけるようになり、教会でも陰で人を支える姿が続いています。",
+          faith:
+            "本人は大げさに語りませんが、親から受け継いだ信仰が日々の姿に表れているように感じます。",
+          recommendReason:
+            "長年、表に出ることは少ない方ですが、教会の信者さんにとって支えになる存在です。その歩みを『陽気』で紹介できれば、教会にとっても大きな励みになると思います。",
+        },
+      };
+
+      function value(id) {
+        return (el[id]?.value || "").trim();
+      }
+
+      function setMode(mode) {
+        modeInput.value = mode;
+        modeButtons.forEach((button) => {
+          button.classList.toggle("active", button.dataset.mode === mode);
+        });
+        recommendOnly.forEach((node) => {
+          node.hidden = mode !== "recommend";
+        });
+        if (mode === "recommend") {
+          el.contactTo.value = "推薦者に連絡";
+        } else {
+          el.contactTo.value = "推薦者に連絡";
+          permission.checked = false;
+        }
+        updateSummary();
+      }
+
+      function filled(id) {
+        return value(id).length >= 8;
+      }
+
+      function score() {
+        const baseItems = [
+          value("submitterName"),
+          value("daikyokai"),
+          value("church"),
+          value("phone") || value("email"),
+          value("theme"),
+          value("scene"),
+          value("event"),
+          value("emotion"),
+          value("change"),
+        ];
+        if (modeInput.value === "recommend") {
+          baseItems.push(value("candidateName"), value("relationship"));
+          if (permission.checked) baseItems.push("permission");
+        }
+        const points = baseItems.filter((item) => item && item.length >= 2).length;
+        return Math.round((points / baseItems.length) * 100);
+      }
+
+      function summarize() {
+        const who =
+          modeInput.value === "recommend"
+            ? value("candidateName") || "推薦された方"
+            : value("submitterName") || "投稿者";
+        const theme = value("theme") || "未選択のテーマ";
+        const scene = value("scene");
+        const event = value("event");
+        const emotion = value("emotion");
+        const change = value("change");
+        const faith = value("faith");
+
+        if (!scene && !event && !emotion && !change) {
+          return "まだ概要を作れません。";
+        }
+
+        const lines = [];
+        lines.push(`${who}の体験談候補。テーマは「${theme}」に近い。`);
+        if (scene) lines.push(`場面: ${shorten(scene, 92)}`);
+        if (event) lines.push(`心に残る出来事: ${shorten(event, 92)}`);
+        if (emotion) lines.push(`当時の思い: ${shorten(emotion, 72)}`);
+        if (change) lines.push(`その後の変化: ${shorten(change, 92)}`);
+        if (faith) lines.push(`現在の受け止め: ${shorten(faith, 72)}`);
+        return lines.join("\n");
+      }
+
+      function buildQuestions() {
+        const list = [];
+        if (!filled("scene")) list.push("いつ頃、どこで、誰がいた場面かをもう少し聞きたい。");
+        if (!filled("event")) list.push("心に残っている言葉や出来事を具体的に聞きたい。");
+        if (!filled("emotion")) list.push("その時どんな気持ちだったかを聞きたい。");
+        if (!filled("change")) list.push("その出来事の後、暮らしや信仰に何が変わったかを聞きたい。");
+        if (!filled("faith")) list.push("今ふり返って、信仰の上でどう受け止めているかを聞きたい。");
+        if (modeInput.value === "recommend" && !filled("recommendReason")) {
+          list.push("教会として、なぜこの方を推薦したいのかを聞きたい。");
+        }
+        if (!list.length) {
+          list.push("電話では、本文に使える具体的な会話や表情を確認したい。");
+          list.push("掲載時に匿名にしたい人物名や確認が必要な事柄を聞きたい。");
+        }
+        return list;
+      }
+
+      function updateSummary() {
+        const currentScore = score();
+        meterBar.style.width = `${currentScore}%`;
+
+        if (currentScore >= 78 && filled("scene") && filled("event") && filled("change")) {
+          verdictTitle.textContent = "編集部で詳しく確認しやすい内容です";
+          verdictText.textContent =
+            "場面、心に残る出来事、その後の変化が見えています。必要に応じて聞き取りを行う際にも確認しやすい状態です。";
+        } else if (currentScore >= 48) {
+          verdictTitle.textContent = "話の輪郭が見えてきました";
+          verdictText.textContent =
+            "もう少し具体的な場面や、その後の変化が入ると、編集部で確認しやすくなります。";
+        } else {
+          verdictTitle.textContent = "もう少し具体的な場面があると整理しやすくなります";
+          verdictText.textContent =
+            "場面、心に残った出来事、その後の変化が入ると、話の概要が見えてきます。";
+        }
+
+        summaryText.textContent = summarize();
+        centralScene.textContent =
+          value("scene") || value("event") || "未入力です。";
+
+        questions.innerHTML = "";
+        for (const question of buildQuestions()) {
+          const li = document.createElement("li");
+          li.textContent = question;
+          questions.appendChild(li);
+        }
+      }
+
+      function showEditorView() {
+        updateSummary();
+        editorView.classList.add("show");
+        const modeLabel =
+          modeInput.value === "recommend" ? "教会関係者による推薦投稿" : "ご本人による投稿";
+        const person =
+          modeInput.value === "recommend"
+            ? `${value("candidateName") || "未入力"}さんを推薦`
+            : `${value("submitterName") || "未入力"}さん本人`;
+
+        document.getElementById("editorMode").textContent = `${modeLabel}\n${person}`;
+        document.getElementById("editorTheme").textContent = value("theme") || "未選択";
+        document.getElementById("editorContact").textContent = [
+          `入力者: ${value("submitterName") || "未入力"}`,
+          `大教会: ${value("daikyokai") || "未入力"}`,
+          `所属教会: ${value("church") || "未入力"}`,
+          `電話番号: ${value("phone") || "未入力"}`,
+          `メール: ${value("email") || "未入力"}`,
+          modeInput.value === "recommend" ? `聞き取りの連絡先: ${value("contactTo") || "未入力"}` : "",
+          modeInput.value === "recommend"
+            ? `本人了承: ${permission.checked ? "確認済み" : "未確認"}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
+        document.getElementById("editorMemo").textContent = summarize();
+        document.getElementById("editorQuestions").textContent = buildQuestions()
+          .map((item, index) => `${index + 1}. ${item}`)
+          .join("\n");
+        document.getElementById("editorFit").textContent =
+          score() >= 78 ? "詳しく確認しやすい" : score() >= 48 ? "追加情報があると確認しやすい" : "もう少し具体的に聞きたい";
+
+        const warnings = [];
+        if (!value("theme")) warnings.push("テーマが未選択です。");
+        if (!value("phone") && !value("email")) warnings.push("電話番号またはメールアドレスが未入力です。");
+        if (modeInput.value === "recommend" && !permission.checked) {
+          warnings.push("推薦投稿では本人了承の確認が必要です。");
+        }
+
+        notice.textContent = warnings.length
+          ? warnings.join(" ")
+          : "試作上の確認画面を作成しました。編集部では、このような形で投稿を一覧確認できます。";
+        notice.classList.add("show");
+        editorView.scrollIntoView({ block: "start" });
+      }
+
+      function shorten(text, max) {
+        const compact = text.replace(/\s+/g, " ").trim();
+        return compact.length > max ? `${compact.slice(0, max)}…` : compact;
+      }
+
+      function fillSample() {
+        const data = samples[modeInput.value];
+        for (const [key, val] of Object.entries(data)) {
+          if (el[key]) el[key].value = val;
+        }
+        if (modeInput.value === "recommend") permission.checked = true;
+        updateSummary();
+      }
+
+      function clearForm() {
+        for (const id of fields) {
+          if (id === "contactTo") continue;
+          if (el[id]) el[id].value = "";
+        }
+        permission.checked = false;
+        notice.classList.remove("show");
+        editorView.classList.remove("show");
+        setMode(modeInput.value);
+      }
+
+      modeButtons.forEach((button) => {
+        button.addEventListener("click", () => setMode(button.dataset.mode));
+      });
+
+      document.querySelectorAll(".chip").forEach((button) => {
+        button.addEventListener("click", () => {
+          const target = button.parentElement.dataset.target;
+          const current = value(target);
+          el[target].value = current ? `${current}\n${button.textContent}` : button.textContent;
+          updateSummary();
+          el[target].focus();
+        });
+      });
+
+      for (const id of fields) {
+        if (el[id]) el[id].addEventListener("input", updateSummary);
+        if (el[id]) el[id].addEventListener("change", updateSummary);
+      }
+      permission.addEventListener("change", updateSummary);
+      document.getElementById("sampleBtn").addEventListener("click", fillSample);
+      document.getElementById("clearBtn").addEventListener("click", clearForm);
+      document.getElementById("submitBtn").addEventListener("click", showEditorView);
+
+      updateSummary();
+    </script>
+  </body>
+</html>
