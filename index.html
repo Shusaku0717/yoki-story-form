@@ -1642,6 +1642,97 @@
         return questions.slice(0, 6);
       }
 
+      function numberedText(items) {
+        return items.map((item, index) => `${index + 1}. ${item}`).join("\n");
+      }
+
+      function collectDiagnosisPayload() {
+        return {
+          mode: modeInput.value,
+          theme: value("theme"),
+          daikyokai: value("daikyokai"),
+          church: value("church"),
+          phone: value("phone"),
+          email: value("email"),
+          scene: value("scene"),
+          event: value("event"),
+          emotion: value("emotion"),
+          change: value("change"),
+          faith: value("faith"),
+          recommendReason: value("recommendReason"),
+        };
+      }
+
+      function canUseAiDiagnosis() {
+        if (typeof location === "undefined") return false;
+        return location.protocol !== "file:" && !location.hostname.endsWith("github.io");
+      }
+
+      function applyRuleDiagnosis() {
+        document.getElementById("editorDiagnosis").textContent = buildEditorialDiagnosis();
+        document.getElementById("editorGaps").textContent = numberedText(buildEditorialGaps());
+        document.getElementById("editorQuestions").textContent = numberedText(buildEditorFollowups());
+        document.getElementById("editorFit").textContent =
+          editorialScore() >= 75
+            ? "素材あり。聞き取りで誌面化を検討できる"
+            : editorialScore() >= 48
+              ? "核はあるが、代表場面の聞き取りが必要"
+              : "素材の入口をもう少し確認したい";
+      }
+
+      function applyAiDiagnosis(data) {
+        if (data.fit) document.getElementById("editorFit").textContent = data.fit;
+        if (Array.isArray(data.diagnosis) && data.diagnosis.length) {
+          const angles = Array.isArray(data.angles) && data.angles.length
+            ? `\n仮の切り口:\n${numberedText(data.angles)}`
+            : "";
+          const cautions = Array.isArray(data.cautions) && data.cautions.length
+            ? `\n注意点:\n${numberedText(data.cautions)}`
+            : "";
+          document.getElementById("editorDiagnosis").textContent =
+            `${data.diagnosis.join("\n")}${angles}${cautions}`;
+        }
+        if (Array.isArray(data.gaps) && data.gaps.length) {
+          document.getElementById("editorGaps").textContent = numberedText(data.gaps);
+        }
+        if (Array.isArray(data.followups) && data.followups.length) {
+          document.getElementById("editorQuestions").textContent = numberedText(data.followups);
+        }
+      }
+
+      async function updateAiDiagnosis(warnings) {
+        if (!canUseAiDiagnosis()) return;
+
+        const baseNotice = warnings.length
+          ? warnings.join(" ")
+          : "確認画面です。気になるところがあれば、入力に戻ってその項目だけ追記できます。";
+        editorNotice.textContent = `${baseNotice} AI診断を確認中です。`;
+        editorNotice.classList.add("show");
+
+        try {
+          const response = await fetch("/api/editor-diagnosis", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(collectDiagnosisPayload()),
+          });
+          const contentType = response.headers.get("content-type") || "";
+          const data = contentType.includes("application/json")
+            ? await response.json()
+            : { error: "AI診断APIがまだ起動していません。" };
+          if (!response.ok) {
+            throw new Error(data.error || "AI診断に失敗しました。");
+          }
+          applyAiDiagnosis(data);
+          const cacheLabel = data.cached ? "同じ内容のためキャッシュを使いました。" : "低コストAI診断を反映しました。";
+          editorNotice.textContent = `${baseNotice} ${cacheLabel}`;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "AI診断に失敗しました。";
+          editorNotice.textContent = `${baseNotice} 今はルール版の診断を表示しています。AI診断はサーバー設定後に反映されます。${message}`;
+        }
+      }
+
       function updateSummary() {
         const currentScore = score();
         meterBar.style.width = `${currentScore}%`;
@@ -1698,19 +1789,7 @@
           .filter(Boolean)
           .join("\n");
         document.getElementById("editorMemo").textContent = summarize();
-        document.getElementById("editorDiagnosis").textContent = buildEditorialDiagnosis();
-        document.getElementById("editorGaps").textContent = buildEditorialGaps()
-          .map((item, index) => `${index + 1}. ${item}`)
-          .join("\n");
-        document.getElementById("editorQuestions").textContent = buildEditorFollowups()
-          .map((item, index) => `${index + 1}. ${item}`)
-          .join("\n");
-        document.getElementById("editorFit").textContent =
-          editorialScore() >= 75
-            ? "素材あり。聞き取りで誌面化を検討できる"
-            : editorialScore() >= 48
-              ? "核はあるが、代表場面の聞き取りが必要"
-              : "素材の入口をもう少し確認したい";
+        applyRuleDiagnosis();
 
         const warnings = [];
         if (!value("theme")) warnings.push("テーマが未選択です。");
@@ -1726,6 +1805,7 @@
           : "確認画面です。気になるところがあれば、入力に戻ってその項目だけ追記できます。";
         editorNotice.classList.add("show");
         editorView.scrollIntoView({ block: "start" });
+        updateAiDiagnosis(warnings);
       }
 
       function finishPrototype() {
