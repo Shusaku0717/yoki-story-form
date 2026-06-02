@@ -1474,6 +1474,7 @@
           modeInput.value === "recommend"
             ? value("candidateName") || "推薦された方"
             : value("submitterName") || "投稿者";
+        const whoLabel = addHonorific(who);
         const theme = value("theme") || "未選択のテーマ";
         const scene = value("scene");
         const event = value("event");
@@ -1487,14 +1488,20 @@
         }
 
         const lines = [];
-        lines.push(`${who}の体験談候補。テーマは「${theme}」に近い。`);
-        if (scene) lines.push(`場面: ${shorten(scene, 92)}`);
-        if (event) lines.push(`心に残る出来事: ${shorten(event, 92)}`);
-        if (emotion) lines.push(`当時の思い: ${shorten(emotion, 72)}`);
-        if (change) lines.push(`その後の変化: ${shorten(change, 92)}`);
-        if (faith) lines.push(`現在の受け止め: ${shorten(faith, 72)}`);
-        if (additionalNote) lines.push(`追加で聞かせていただいたこと: ${shorten(additionalNote, 92)}`);
+        lines.push(`${whoLabel}の体験談候補。テーマは「${theme}」に近い。`);
+        if (scene) lines.push(`場面: ${scene}`);
+        if (event) lines.push(`心に残る出来事: ${event}`);
+        if (emotion) lines.push(`当時の思い: ${emotion}`);
+        if (change) lines.push(`その後の変化: ${change}`);
+        if (faith) lines.push(`現在の受け止め: ${faith}`);
+        if (additionalNote) lines.push(`追加で聞かせていただいたこと: ${additionalNote}`);
         return lines.join("\n");
+      }
+
+      function addHonorific(name) {
+        if (!name) return "投稿者";
+        if (/(さん|様|先生|氏|方)$/.test(name)) return name;
+        return `${name}さん`;
       }
 
       function buildQuestions() {
@@ -1669,7 +1676,7 @@
         const questions = [];
 
         if (signals.daughter) {
-          questions.push("娘さんがその言葉を言われた時の場所や表情など、思い出せることはありますか。");
+          questions.push("娘さんの言葉を聞いた時、娘さんの表情や声の調子、ご自身の心の動きで覚えていることはありますか。");
         } else if (!signals.quote && !signals.eventVoice) {
           questions.push("その時、心に残った言葉や相手の様子があれば教えてください。");
         }
@@ -1677,7 +1684,7 @@
           questions.push("病気が分かった時や治療中に、特に心に残っている場面はありますか。");
         }
         if (signals.family) {
-          questions.push("その出来事の前後で、家族との時間や接し方に変わったことはありますか。");
+          questions.push("家族とゆっくり話せる時間の中で、他にも印象に残っている会話や場面はありますか。");
         }
         if (!signals.faithWord || value("faith").length < 40) {
           questions.push("今ふり返って、信仰の上ではどのように受け止めていますか。");
@@ -1694,11 +1701,7 @@
       }
 
       function toPublicFollowups(items) {
-        const publicItems = items
-          .filter((item) => !/(掲載|伏せたい|匿名|推薦者|了承|連絡|編集部)/.test(item))
-          .map((item) => item.replace(/確認したいです。?$/, "教えてください。"))
-          .slice(0, 3);
-        return publicItems.length ? publicItems : buildPublicFollowups();
+        return buildPublicFollowups();
       }
 
       function collectDiagnosisPayload() {
@@ -1719,7 +1722,60 @@
         };
       }
 
+      function textOf(id) {
+        return (document.getElementById(id)?.textContent || "").trim();
+      }
+
+      function buildWarnings() {
+        const warnings = [];
+        if (!value("theme")) warnings.push("テーマが未選択です。");
+        if (!value("phone") && !value("email")) warnings.push("電話番号またはメールアドレスが未入力です。");
+        if (!emailLooksValid()) warnings.push("メールアドレスの形式を確認してください。");
+        if (modeInput.value === "recommend" && !permission.checked) {
+          warnings.push("推薦投稿では本人了承の確認が必要です。");
+        }
+        return warnings;
+      }
+
+      function collectSubmissionPayload() {
+        return {
+          mode: modeInput.value,
+          score: score(),
+          summary: summarize(),
+          publicFollowupQuestions: textOf("publicFollowupQuestions"),
+          warnings: buildWarnings(),
+          submitterName: value("submitterName"),
+          daikyokai: value("daikyokai"),
+          church: value("church"),
+          candidateName: value("candidateName"),
+          relationship: value("relationship"),
+          phone: value("phone"),
+          email: value("email"),
+          contactTo: value("contactTo"),
+          theme: value("theme"),
+          scene: value("scene"),
+          event: value("event"),
+          emotion: value("emotion"),
+          change: value("change"),
+          faith: value("faith"),
+          additionalNote: value("additionalNote"),
+          recommendReason: value("recommendReason"),
+          permissionChecked: permission.checked,
+          editorial: {
+            fit: textOf("editorFit"),
+            diagnosis: textOf("editorDiagnosis"),
+            gaps: textOf("editorGaps"),
+            followups: textOf("editorQuestions"),
+          },
+        };
+      }
+
       function canUseAiDiagnosis() {
+        if (typeof location === "undefined") return false;
+        return location.protocol !== "file:" && !location.hostname.endsWith("github.io");
+      }
+
+      function canUseLocalSubmission() {
         if (typeof location === "undefined") return false;
         return location.protocol !== "file:" && !location.hostname.endsWith("github.io");
       }
@@ -1851,13 +1907,7 @@
         document.getElementById("editorMemo").textContent = summarize();
         applyRuleDiagnosis();
 
-        const warnings = [];
-        if (!value("theme")) warnings.push("テーマが未選択です。");
-        if (!value("phone") && !value("email")) warnings.push("電話番号またはメールアドレスが未入力です。");
-        if (!emailLooksValid()) warnings.push("メールアドレスの形式を確認してください。");
-        if (modeInput.value === "recommend" && !permission.checked) {
-          warnings.push("推薦投稿では本人了承の確認が必要です。");
-        }
+        const warnings = buildWarnings();
 
         notice.classList.remove("show");
         editorNotice.textContent = warnings.length
@@ -1868,10 +1918,41 @@
         updateAiDiagnosis(warnings);
       }
 
-      function finishPrototype() {
-        editorNotice.textContent =
-          "試作品のため、ここでは実際の送信は行いません。実運用では、この操作で編集部に内容が送られます。";
+      async function finishPrototype() {
+        if (!canUseLocalSubmission()) {
+          editorNotice.textContent =
+            "公開版は表示確認用です。実際に編集部側へ保存する確認は、ローカルサーバー版で行います。";
+          editorNotice.classList.add("show");
+          editorNotice.scrollIntoView({ block: "center" });
+          return;
+        }
+
+        const button = document.getElementById("finishBtn");
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = "送信中です";
+        editorNotice.textContent = "編集部側の受信画面へ保存しています。";
         editorNotice.classList.add("show");
+
+        try {
+          const response = await fetch("/api/submissions", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(collectSubmissionPayload()),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "送信に失敗しました。");
+          }
+          button.textContent = "送信済み（試作品）";
+          editorNotice.innerHTML =
+            `編集部側の受信画面に保存しました。<a href="editor-inbox.html#${encodeURIComponent(data.id)}">編集部画面で確認する</a>`;
+        } catch (error) {
+          button.disabled = false;
+          button.textContent = originalText;
+          editorNotice.textContent =
+            error instanceof Error ? error.message : "送信に失敗しました。もう一度お試しください。";
+        }
         editorNotice.scrollIntoView({ block: "center" });
       }
 
